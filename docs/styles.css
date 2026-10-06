@@ -1,1 +1,132 @@
-/* css styles */
+/* Google Fonts: Plus Jakarta Sans */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
+
+/* Global Font Settings */
+body, 
+.navbar, 
+h1, h2, h3, h4, h5, h6, 
+p, a, span, button {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* Centered Hero Layout */
+.hero-centered-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 5rem 1.5rem;
+}
+
+/* Avatar: Centered, Seamless, Circular, Proportional */
+.hero-avatar {
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+/* Hero Title */
+.hero-title {
+  font-size: 2.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #1a1a1a;
+  text-align: center;
+  transition: color 0.3s ease;
+}
+
+body.quarto-dark .hero-title {
+  color: #f8fafc;
+}
+
+/* Social Links */
+.social-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-bottom: 2.25rem;
+}
+
+.social-icon {
+  font-size: 1.4rem;
+  color: #495057;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+body.quarto-dark .social-icon {
+  color: #cbd5e1;
+}
+
+.social-icon:hover {
+  color: #0d6efd;
+  transform: translateY(-2px);
+}
+
+body.quarto-dark .social-icon:hover {
+  color: #60a5fa;
+}
+
+/* Bio Container: Centered Frame with Left-Aligned Text */
+.bio-container {
+  max-width: 580px;
+  width: 100%;
+  text-align: left;
+  margin: 0 auto;
+}
+
+.bio-container p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #374151;
+  margin-bottom: 0.85rem;
+  transition: color 0.3s ease;
+}
+
+body.quarto-dark .bio-container p {
+  color: #e2e8f0;
+}
+
+.bio-container p:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+  .hero-centered-container {
+    padding: 2rem 1.25rem 3rem 1.25rem;
+  }
+  
+  .hero-avatar {
+    width: 160px;
+    height: 160px;
+    margin-bottom: 1.25rem;
+  }
+  
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .social-links {
+    margin-bottom: 1.75rem;
+  }
+  
+  .bio-container p {
+    font-size: 1.05rem;
+    line-height: 1.75;
+  }
+}

@@ -1,17 +1,21 @@
 ---
-title: "Nusa Seldi"
-about: 
-  template: trestles
-  image: avatars.svg
-  links: 
-    - icon: twitter
-      text: Twitter
-      href: https://twitter.com
-    - icon: github
-      text: Github
-      href: https://github.com/nusaseldi
+pagetitle: "Nusa Seldi Wibisono"
+page-layout: article
+toc: false
 ---
 
+::: hero-centered-container
+![](avatars.svg){.hero-avatar alt="Nusa Seldi Wibisono"}
+
+# Nusa Seldi Wibisono {.hero-title}
+
+::: social-links
+<a href="https://github.com/nusaseldi" class="social-icon" title="GitHub" target="_blank"><i class="bi bi-github"></i></a> <a href="https://x.com/nusaseldi" class="social-icon" title="X (Twitter)" target="_blank"><i class="bi bi-twitter-x"></i></a> <a href="https://www.instagram.com/nusaseldi/" class="social-icon" title="Instagram" target="_blank"><i class="bi bi-instagram"></i></a> <a href="https://www.strava.com/athletes/179740513" class="social-icon" title="Strava" target="_blank"><i class="bi bi-strava"></i></a>
+:::
+
+::: bio-container
 Hello!
 
-I am Nusa Seldi Wibisono. Learning about data and enjoy spending time listening to music.
+I am Nusa. Right now, I'm learning data science and analytics with a strong passion for uncovering meaningful insights from data. When I'm not exploring data, you'll find me listening to music, cycling, or going for a run.
+:::
+:::

@@ -3,7 +3,7 @@ title: "Titanic Survival Prediction with Tidymodels and Random Forest"
 author: "Nusa Seldi Wibisono"
 date: "2026-10-14"
 categories: [code, tidymodels, random forest, classification, feature engineering, kaggle, titanic]
-image: "thumbnail.jpg"
+image: "thumbnail.png"
 description: "Predicting passenger survival on the Titanic using Tidymodels recipes, KNN imputation, feature engineering, and hyperparameter-tuned Random Forest in R."
 code-fold: true
 code-tools: true
@@ -14,13 +14,13 @@ The sinking of the Titanic is one of the most infamous shipwrecks in history. On
 
 In this project, based on the classic [Kaggle Titanic: Machine Learning from Disaster](https://www.kaggle.com/competitions/titanic) competition, we build an end-to-end classification pipeline using **R**, **Tidyverse**, and **Tidymodels** to predict which passengers survived the tragedy.
 
----
+------------------------------------------------------------------------
 
 ## 1. Environment & Setup
 
 We begin by loading the core packages: `tidyverse` for data manipulation and `tidymodels` for a clean, unified modeling workflow.
 
-```r
+``` r
 # Load libraries
 library(tidymodels)
 library(tidyverse)
@@ -28,7 +28,7 @@ library(tidyverse)
 
 Next, we load the training and test datasets:
 
-```r
+``` r
 # Import datasets
 titanic_train <- read_csv("train.csv")
 titanic_test  <- read_csv("test.csv")
@@ -36,23 +36,23 @@ titanic_test  <- read_csv("test.csv")
 
 Let's inspect the dimensions and structure of the datasets:
 
-- **Train set:** 891 rows, 12 columns
-- **Test set:** 418 rows, 11 columns (without the target variable `Survived`)
+-   **Train set:** 891 rows, 12 columns
+-   **Test set:** 418 rows, 11 columns (without the target variable `Survived`)
 
----
+------------------------------------------------------------------------
 
 ## 2. Exploratory Data Analysis & Missing Values
 
 Before feature engineering, let's combine both datasets to inspect missing values across the entire passenger population.
 
-```r
+``` r
 titanic_full <- bind_rows(titanic_train, titanic_test)
 
 titanic_full |> 
   summarise_all(~ sum(is.na(.)))
 ```
 
-```
+```         
 # A tibble: 1 × 12
   PassengerId Survived Pclass  Name   Sex   Age SibSp Parch Ticket  Fare Cabin Embarked
         <int>    <int>  <int> <int> <int> <int> <int> <int>  <int> <int> <int>    <int>
@@ -60,27 +60,30 @@ titanic_full |>
 ```
 
 ### Key Observations:
-- **`Survived`**: 418 missing values correspond precisely to the test dataset.
-- **`Age`**: 263 passengers have missing ages. We will impute this using K-Nearest Neighbors (KNN).
-- **`Cabin`**: Over 1,000 values are missing (nearly 77% of total records), so we drop this column to avoid sparse noise.
-- **`Embarked`**: Only 2 missing values, ideal for mode imputation.
-- **`Fare`**: Exactly 1 missing value in the test set, suitable for linear imputation.
 
----
+-   **`Survived`**: 418 missing values correspond precisely to the test dataset.
+-   **`Age`**: 263 passengers have missing ages. We will impute this using K-Nearest Neighbors (KNN).
+-   **`Cabin`**: Over 1,000 values are missing (nearly 77% of total records), so we drop this column to avoid sparse noise.
+-   **`Embarked`**: Only 2 missing values, ideal for mode imputation.
+-   **`Fare`**: Exactly 1 missing value in the test set, suitable for linear imputation.
+
+------------------------------------------------------------------------
 
 ## 3. Feature Engineering
 
 Domain knowledge plays a crucial role in improving model accuracy. Here, we engineer two key features:
 
 ### A. Family Size (`FamilySize`)
+
 We combine `SibSp` (siblings / spouses aboard) and `Parch` (parents / children aboard) plus the passenger themselves (+1) to represent the total family size:
 
 $$\text{FamilySize} = \text{SibSp} + \text{Parch} + 1$$
 
 ### B. Title Extraction from Name
+
 Passenger names contain social titles (`Mr.`, `Mrs.`, `Miss.`, `Master.`, `Dr.`, `Rev.`, etc.) that provide strong signals regarding age, gender, and social status.
 
-```r
+``` r
 # 1. Engineer FamilySize
 titanic_full <- titanic_full |>
   mutate(FamilySize = SibSp + Parch + 1) |>
@@ -100,7 +103,7 @@ titanic_full |>
   mutate(prop = n / sum(n))
 ```
 
-```
+```         
 # A tibble: 18 × 3
    title       n    prop
    <chr>   <int>   <dbl>
@@ -119,22 +122,19 @@ titanic_full |>
 
 Finally, we drop uninformative columns and convert categorical variables into factors:
 
-```r
+``` r
 titanic_full <- titanic_full |> 
   select(-Cabin, -Ticket, -Name) |> 
   mutate(across(c(Survived, Pclass, Sex, Embarked, title), as.factor))
 ```
 
----
+------------------------------------------------------------------------
 
 ## 4. Missing Data Imputation with Recipes
 
-Instead of simple mean imputation, we use Tidymodels `recipes` to perform context-aware imputations:
-1. **`Embarked`**: Mode imputation (`step_impute_mode`).
-2. **`Fare`**: Linear regression imputation based on predictors (`step_impute_linear`).
-3. **`Age`**: K-Nearest Neighbors imputation (`step_impute_knn`) using similar passenger profiles.
+Instead of simple mean imputation, we use Tidymodels `recipes` to perform context-aware imputations: 1. **`Embarked`**: Mode imputation (`step_impute_mode`). 2. **`Fare`**: Linear regression imputation based on predictors (`step_impute_linear`). 3. **`Age`**: K-Nearest Neighbors imputation (`step_impute_knn`) using similar passenger profiles.
 
-```r
+``` r
 # Define imputation recipe
 impute_recipe <- recipe(Survived ~ ., data = titanic_full) |>
   step_impute_mode(Embarked) |>
@@ -147,9 +147,10 @@ imputed <- bake(impute_recipe, new_data = titanic_full)
 ```
 
 ### Age Group Discretization
+
 To help tree-based models capture non-linear life-stage dynamics (e.g., children prioritized during lifeboat evacuation):
 
-```r
+``` r
 imputed <- imputed |> 
   mutate(Age = case_when(
     Age < 8 ~ "child",
@@ -160,13 +161,13 @@ imputed <- imputed |>
   mutate(Age = as.factor(Age))
 ```
 
----
+------------------------------------------------------------------------
 
 ## 5. Modeling Workflow with Tidymodels
 
 We split the processed data back into training (891 rows) and test (418 rows) sets, followed by an **80/20 train-validation split** stratified by `Survived`.
 
-```r
+``` r
 titanic_train <- imputed |> slice(1:891)
 titanic_test  <- imputed |> slice(892:1309)
 
@@ -177,9 +178,10 @@ test  <- testing(split)
 ```
 
 ### Preprocessing Recipe & Cross-Validation
+
 We normalize numeric predictors, collapse infrequent titles (`threshold = 0.02`), and create dummy variables for nominal features. We also set up **10-Fold Cross-Validation**:
 
-```r
+``` r
 titanic_recipe <- recipe(Survived ~ ., data = train) |> 
   update_role(PassengerId, new_role = "id") |>
   step_normalize(all_numeric_predictors()) |>
@@ -190,15 +192,13 @@ set.seed(345)
 folds <- vfold_cv(train, v = 10, repeats = 1, strata = Survived)
 ```
 
----
+------------------------------------------------------------------------
 
 ## 6. Model Specification & Hyperparameter Tuning
 
-We choose a **Random Forest** classifier using the high-performance `ranger` engine. We tune two critical hyperparameters:
-- `mtry`: Number of predictors sampled at each split.
-- `min_n`: Minimum number of data points in a node required for further splitting.
+We choose a **Random Forest** classifier using the high-performance `ranger` engine. We tune two critical hyperparameters: - `mtry`: Number of predictors sampled at each split. - `min_n`: Minimum number of data points in a node required for further splitting.
 
-```r
+``` r
 # Random Forest model specification
 rf_spec <- rand_forest(
   mtry  = tune(),
@@ -222,17 +222,17 @@ rf_tune <- tune_grid(
 )
 ```
 
----
+------------------------------------------------------------------------
 
 ## 7. Model Evaluation
 
 Let's examine the top-performing hyperparameter configurations based on classification accuracy:
 
-```r
+``` r
 show_best(rf_tune, metric = "accuracy")
 ```
 
-```
+```         
 # A tibble: 5 × 8
    mtry min_n .metric  .estimator  mean     n std_err .config              
   <int> <int> <chr>    <chr>      <dbl> <int>   <dbl> <chr>                
@@ -246,9 +246,10 @@ show_best(rf_tune, metric = "accuracy")
 The best configuration achieves **84.4% cross-validated accuracy** with `mtry = 6` and `min_n = 13`.
 
 ### Final Fit on Holdout Test Split
+
 We finalize the workflow with the best hyperparameter configuration and evaluate on our held-out 20% validation split:
 
-```r
+``` r
 final_rf <- titanic_workflow |>
   finalize_workflow(select_best(rf_tune, metric = "accuracy"))
 
@@ -258,7 +259,7 @@ final_fit <- final_rf |>
 collect_metrics(final_fit)
 ```
 
-```
+```         
 # A tibble: 3 × 4
   .metric     .estimator .estimate .config             
   <chr>       <chr>          <dbl> <chr>               
@@ -267,18 +268,15 @@ collect_metrics(final_fit)
 3 brier_class binary         0.116 Preprocessor1_Model1
 ```
 
-> **Results Summary:**
-> - **Test Accuracy:** **84.9%**
-> - **ROC-AUC:** **0.884**
-> - **Brier Score:** **0.116** (indicating well-calibrated probability predictions)
+> **Results Summary:** - **Test Accuracy:** **84.9%** - **ROC-AUC:** **0.884** - **Brier Score:** **0.116** (indicating well-calibrated probability predictions)
 
----
+------------------------------------------------------------------------
 
 ## 8. Generating Final Test Predictions
 
 With our trained model, we generate survival predictions for Kaggle's test dataset (`test.csv`):
 
-```r
+``` r
 final_model <- extract_workflow(final_fit)
 
 predictions <- final_model |> 
@@ -293,11 +291,11 @@ submission <- titanic_test |>
 write_csv(submission, file = "predict.csv")
 ```
 
-```r
+``` r
 head(submission, 10)
 ```
 
-```
+```         
 # A tibble: 10 × 2
    PassengerId Survived
          <dbl> <fct>   
@@ -313,14 +311,14 @@ head(submission, 10)
 10         901 0       
 ```
 
----
+------------------------------------------------------------------------
 
 ## 9. Conclusion & Takeaways
 
 By leveraging **Tidymodels**, we maintained a clean, reproducible, and modular machine learning pipeline:
 
-1. **Feature Engineering Impact**: Deriving social titles (`title`) and family scale (`FamilySize`) provided strong predictive power beyond raw tabular columns.
-2. **KNN Imputation**: Replaced arbitrary age guessing with neighbor-based statistical imputation.
-3. **Cross-Validation Tuning**: Systematically optimized Random Forest hyperparameters, yielding a solid **84.9% accuracy** and **0.884 ROC-AUC**.
+1.  **Feature Engineering Impact**: Deriving social titles (`title`) and family scale (`FamilySize`) provided strong predictive power beyond raw tabular columns.
+2.  **KNN Imputation**: Replaced arbitrary age guessing with neighbor-based statistical imputation.
+3.  **Cross-Validation Tuning**: Systematically optimized Random Forest hyperparameters, yielding a solid **84.9% accuracy** and **0.884 ROC-AUC**.
 
 Feel free to explore the full repository on GitHub: [nusaseldi/kaggle-datasets](https://github.com/nusaseldi/kaggle-datasets).

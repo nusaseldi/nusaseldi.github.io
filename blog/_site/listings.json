@@ -2,6 +2,9 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/titanic-survival-prediction/index.html",
+      "/posts/book-dashboard/index.html",
+      "/posts/spaceship-titanic/index.html",
       "/posts/ames-housing/index.html",
       "/posts/palmer-penguins/index.html",
       "/posts/workflows-tidymodels/index.html",

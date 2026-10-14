@@ -2,6 +2,7 @@
   {
     "listing": "/blog/index.html",
     "items": [
+      "/blog/posts/titanic-survival-prediction/index.html",
       "/blog/posts/book-dashboard/index.html",
       "/blog/posts/spaceship-titanic/index.html",
       "/blog/posts/ames-housing/index.html",

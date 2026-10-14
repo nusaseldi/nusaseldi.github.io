@@ -159,5 +159,75 @@
     "title": "Books Dashboard",
     "section": "MyBook Dashboard",
     "text": "MyBook Dashboard\nHello, for this time i built dashboard to track the books that i have read. To see the dashboard you can visit https://nusaseldi.github.io/mybook_dashboard.\nIn the dashboard, you can see how many books that i already read and the details about the book from title, author, genre, and pages. I also included the the rating that i got from goodreads. I hope I can read books consistently every month!"
+  },
+  {
+    "objectID": "posts/titanic-survival-prediction/index.html",
+    "href": "posts/titanic-survival-prediction/index.html",
+    "title": "Titanic Survival Prediction with Tidymodels and Random Forest",
+    "section": "",
+    "text": "The sinking of the Titanic is one of the most infamous shipwrecks in history. On April 15, 1912, during her maiden voyage, the widely considered “unsinkable” RMS Titanic sank after colliding with an iceberg, resulting in the death of 1,502 out of 2,224 passengers and crew.\nIn this project, based on the classic Kaggle Titanic: Machine Learning from Disaster competition, we build an end-to-end classification pipeline using R, Tidyverse, and Tidymodels to predict which passengers survived the tragedy."
+  },
+  {
+    "objectID": "posts/titanic-survival-prediction/index.html#environment-setup",
+    "href": "posts/titanic-survival-prediction/index.html#environment-setup",
+    "title": "Titanic Survival Prediction with Tidymodels and Random Forest",
+    "section": "1. Environment & Setup",
+    "text": "1. Environment & Setup\nWe begin by loading the core packages: tidyverse for data manipulation and tidymodels for a clean, unified modeling workflow.\n# Load libraries\nlibrary(tidymodels)\nlibrary(tidyverse)\nNext, we load the training and test datasets:\n# Import datasets\ntitanic_train &lt;- read_csv(\"train.csv\")\ntitanic_test  &lt;- read_csv(\"test.csv\")\nLet’s inspect the dimensions and structure of the datasets:\n\nTrain set: 891 rows, 12 columns\nTest set: 418 rows, 11 columns (without the target variable Survived)"
+  },
+  {
+    "objectID": "posts/titanic-survival-prediction/index.html#exploratory-data-analysis-missing-values",
+    "href": "posts/titanic-survival-prediction/index.html#exploratory-data-analysis-missing-values",
+    "title": "Titanic Survival Prediction with Tidymodels and Random Forest",
+    "section": "2. Exploratory Data Analysis & Missing Values",
+    "text": "2. Exploratory Data Analysis & Missing Values\nBefore feature engineering, let’s combine both datasets to inspect missing values across the entire passenger population.\ntitanic_full &lt;- bind_rows(titanic_train, titanic_test)\n\ntitanic_full |&gt; \n  summarise_all(~ sum(is.na(.)))\n# A tibble: 1 × 12\n  PassengerId Survived Pclass  Name   Sex   Age SibSp Parch Ticket  Fare Cabin Embarked\n        &lt;int&gt;    &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;\n            0      418      0     0     0   263     0     0      0     1  1014        2\n\nKey Observations:\n\nSurvived: 418 missing values correspond precisely to the test dataset.\nAge: 263 passengers have missing ages. We will impute this using K-Nearest Neighbors (KNN).\nCabin: Over 1,000 values are missing (nearly 77% of total records), so we drop this column to avoid sparse noise.\nEmbarked: Only 2 missing values, ideal for mode imputation.\nFare: Exactly 1 missing value in the test set, suitable for linear imputation."
+  },
+  {
+    "objectID": "posts/titanic-survival-prediction/index.html#feature-engineering",
+    "href": "posts/titanic-survival-prediction/index.html#feature-engineering",
+    "title": "Titanic Survival Prediction with Tidymodels and Random Forest",
+    "section": "3. Feature Engineering",
+    "text": "3. Feature Engineering\nDomain knowledge plays a crucial role in improving model accuracy. Here, we engineer two key features:\n\nA. Family Size (FamilySize)\nWe combine SibSp (siblings / spouses aboard) and Parch (parents / children aboard) plus the passenger themselves (+1) to represent the total family size:\n\\[\\text{FamilySize} = \\text{SibSp} + \\text{Parch} + 1\\]\n\n\nB. Title Extraction from Name\nPassenger names contain social titles (Mr., Mrs., Miss., Master., Dr., Rev., etc.) that provide strong signals regarding age, gender, and social status.\n# 1. Engineer FamilySize\ntitanic_full &lt;- titanic_full |&gt;\n  mutate(FamilySize = SibSp + Parch + 1) |&gt;\n  select(-SibSp, -Parch)\n\n# 2. Extract passenger title\ntitanic_full$title &lt;- titanic_full$Name |&gt;\n  str_extract(\"([A-z]+)\\\\.\") |&gt;\n  str_sub(end = -2)\n\n# Check distribution of titles\ntitanic_full |&gt;\n  group_by(title) |&gt;\n  count() |&gt;\n  arrange(desc(n)) |&gt;\n  ungroup() |&gt;\n  mutate(prop = n / sum(n))\n# A tibble: 18 × 3\n   title       n    prop\n   &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt;\n 1 Mr        757 0.578  \n 2 Miss      260 0.199  \n 3 Mrs       197 0.150  \n 4 Master     61 0.0466 \n 5 Rev         8 0.00611\n 6 Dr          8 0.00611\n 7 Col         4 0.00306\n 8 Mlle        2 0.00153\n 9 Major       2 0.00153\n10 Ms          2 0.00153\n# ℹ 8 more rows\nFinally, we drop uninformative columns and convert categorical variables into factors:\ntitanic_full &lt;- titanic_full |&gt; \n  select(-Cabin, -Ticket, -Name) |&gt; \n  mutate(across(c(Survived, Pclass, Sex, Embarked, title), as.factor))"
+  },
+  {
+    "objectID": "posts/titanic-survival-prediction/index.html#missing-data-imputation-with-recipes",
+    "href": "posts/titanic-survival-prediction/index.html#missing-data-imputation-with-recipes",
+    "title": "Titanic Survival Prediction with Tidymodels and Random Forest",
+    "section": "4. Missing Data Imputation with Recipes",
+    "text": "4. Missing Data Imputation with Recipes\nInstead of simple mean imputation, we use Tidymodels recipes to perform context-aware imputations: 1. Embarked: Mode imputation (step_impute_mode). 2. Fare: Linear regression imputation based on predictors (step_impute_linear). 3. Age: K-Nearest Neighbors imputation (step_impute_knn) using similar passenger profiles.\n# Define imputation recipe\nimpute_recipe &lt;- recipe(Survived ~ ., data = titanic_full) |&gt;\n  step_impute_mode(Embarked) |&gt;\n  step_impute_linear(Fare) |&gt;\n  step_impute_knn(Age) |&gt;\n  prep()\n\n# Apply imputation\nimputed &lt;- bake(impute_recipe, new_data = titanic_full)\n\nAge Group Discretization\nTo help tree-based models capture non-linear life-stage dynamics (e.g., children prioritized during lifeboat evacuation):\nimputed &lt;- imputed |&gt; \n  mutate(Age = case_when(\n    Age &lt; 8 ~ \"child\",\n    Age &gt;= 8 & Age &lt; 19 ~ \"teenager\",\n    Age &gt;= 19 & Age &lt;= 60 ~ \"adult\",\n    TRUE ~ \"senior\"\n  )) |&gt; \n  mutate(Age = as.factor(Age))"
+  },
+  {
+    "objectID": "posts/titanic-survival-prediction/index.html#modeling-workflow-with-tidymodels",
+    "href": "posts/titanic-survival-prediction/index.html#modeling-workflow-with-tidymodels",
+    "title": "Titanic Survival Prediction with Tidymodels and Random Forest",
+    "section": "5. Modeling Workflow with Tidymodels",
+    "text": "5. Modeling Workflow with Tidymodels\nWe split the processed data back into training (891 rows) and test (418 rows) sets, followed by an 80/20 train-validation split stratified by Survived.\ntitanic_train &lt;- imputed |&gt; slice(1:891)\ntitanic_test  &lt;- imputed |&gt; slice(892:1309)\n\nset.seed(777)\nsplit &lt;- initial_split(titanic_train, prop = 0.8, strata = Survived)\ntrain &lt;- training(split)\ntest  &lt;- testing(split)\n\nPreprocessing Recipe & Cross-Validation\nWe normalize numeric predictors, collapse infrequent titles (threshold = 0.02), and create dummy variables for nominal features. We also set up 10-Fold Cross-Validation:\ntitanic_recipe &lt;- recipe(Survived ~ ., data = train) |&gt; \n  update_role(PassengerId, new_role = \"id\") |&gt;\n  step_normalize(all_numeric_predictors()) |&gt;\n  step_other(title, threshold = 0.02) |&gt;\n  step_dummy(all_nominal_predictors())\n\nset.seed(345)\nfolds &lt;- vfold_cv(train, v = 10, repeats = 1, strata = Survived)"
+  },
+  {
+    "objectID": "posts/titanic-survival-prediction/index.html#model-specification-hyperparameter-tuning",
+    "href": "posts/titanic-survival-prediction/index.html#model-specification-hyperparameter-tuning",
+    "title": "Titanic Survival Prediction with Tidymodels and Random Forest",
+    "section": "6. Model Specification & Hyperparameter Tuning",
+    "text": "6. Model Specification & Hyperparameter Tuning\nWe choose a Random Forest classifier using the high-performance ranger engine. We tune two critical hyperparameters: - mtry: Number of predictors sampled at each split. - min_n: Minimum number of data points in a node required for further splitting.\n# Random Forest model specification\nrf_spec &lt;- rand_forest(\n  mtry  = tune(),\n  min_n = tune(),\n  trees = 1000\n) |&gt; \n  set_engine(\"ranger\") |&gt;\n  set_mode(\"classification\")\n\n# Combine recipe and model into a workflow\ntitanic_workflow &lt;- workflow() |&gt;\n  add_recipe(titanic_recipe) |&gt;\n  add_model(rf_spec)\n\n# Tune hyperparameters across 10-fold cross validation\nrf_tune &lt;- tune_grid(\n  titanic_workflow,\n  resamples = folds,\n  grid = 10, \n  control = control_grid(save_pred = TRUE, parallel_over = \"everything\")\n)"
+  },
+  {
+    "objectID": "posts/titanic-survival-prediction/index.html#model-evaluation",
+    "href": "posts/titanic-survival-prediction/index.html#model-evaluation",
+    "title": "Titanic Survival Prediction with Tidymodels and Random Forest",
+    "section": "7. Model Evaluation",
+    "text": "7. Model Evaluation\nLet’s examine the top-performing hyperparameter configurations based on classification accuracy:\nshow_best(rf_tune, metric = \"accuracy\")\n# A tibble: 5 × 8\n   mtry min_n .metric  .estimator  mean     n std_err .config              \n  &lt;int&gt; &lt;int&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                \n1     6    13 accuracy binary     0.844    10  0.0165 Preprocessor1_Model04\n2     6    37 accuracy binary     0.838    10  0.0162 Preprocessor1_Model08\n3    13    35 accuracy binary     0.837    10  0.0162 Preprocessor1_Model09\n4     8    25 accuracy binary     0.836    10  0.0164 Preprocessor1_Model07\n5     9    25 accuracy binary     0.834    10  0.0159 Preprocessor1_Model02\nThe best configuration achieves 84.4% cross-validated accuracy with mtry = 6 and min_n = 13.\n\nFinal Fit on Holdout Test Split\nWe finalize the workflow with the best hyperparameter configuration and evaluate on our held-out 20% validation split:\nfinal_rf &lt;- titanic_workflow |&gt;\n  finalize_workflow(select_best(rf_tune, metric = \"accuracy\"))\n\nfinal_fit &lt;- final_rf |&gt;\n  last_fit(split)\n\ncollect_metrics(final_fit)\n# A tibble: 3 × 4\n  .metric     .estimator .estimate .config             \n  &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               \n1 accuracy    binary         0.849 Preprocessor1_Model1\n2 roc_auc     binary         0.884 Preprocessor1_Model1\n3 brier_class binary         0.116 Preprocessor1_Model1\n\nResults Summary: - Test Accuracy: 84.9% - ROC-AUC: 0.884 - Brier Score: 0.116 (indicating well-calibrated probability predictions)"
+  },
+  {
+    "objectID": "posts/titanic-survival-prediction/index.html#generating-final-test-predictions",
+    "href": "posts/titanic-survival-prediction/index.html#generating-final-test-predictions",
+    "title": "Titanic Survival Prediction with Tidymodels and Random Forest",
+    "section": "8. Generating Final Test Predictions",
+    "text": "8. Generating Final Test Predictions\nWith our trained model, we generate survival predictions for Kaggle’s test dataset (test.csv):\nfinal_model &lt;- extract_workflow(final_fit)\n\npredictions &lt;- final_model |&gt; \n  predict(titanic_test)\n\nsubmission &lt;- titanic_test |&gt;\n  select(PassengerId) |&gt;\n  bind_cols(predictions) |&gt;\n  rename(Survived = .pred_class)\n\n# Export submission file\nwrite_csv(submission, file = \"predict.csv\")\nhead(submission, 10)\n# A tibble: 10 × 2\n   PassengerId Survived\n         &lt;dbl&gt; &lt;fct&gt;   \n 1         892 0       \n 2         893 1       \n 3         894 0       \n 4         895 0       \n 5         896 1       \n 6         897 0       \n 7         898 1       \n 8         899 0       \n 9         900 1       \n10         901 0"
+  },
+  {
+    "objectID": "posts/titanic-survival-prediction/index.html#conclusion-takeaways",
+    "href": "posts/titanic-survival-prediction/index.html#conclusion-takeaways",
+    "title": "Titanic Survival Prediction with Tidymodels and Random Forest",
+    "section": "9. Conclusion & Takeaways",
+    "text": "9. Conclusion & Takeaways\nBy leveraging Tidymodels, we maintained a clean, reproducible, and modular machine learning pipeline:\n\nFeature Engineering Impact: Deriving social titles (title) and family scale (FamilySize) provided strong predictive power beyond raw tabular columns.\nKNN Imputation: Replaced arbitrary age guessing with neighbor-based statistical imputation.\nCross-Validation Tuning: Systematically optimized Random Forest hyperparameters, yielding a solid 84.9% accuracy and 0.884 ROC-AUC.\n\nFeel free to explore the full repository on GitHub: nusaseldi/kaggle-datasets."
   }
 ]

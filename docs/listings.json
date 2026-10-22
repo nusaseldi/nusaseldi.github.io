@@ -2,6 +2,7 @@
   {
     "listing": "/blog/index.html",
     "items": [
+      "/blog/posts/wisconsin-cancer-classification/index.html",
       "/blog/posts/titanic-survival-prediction/index.html",
       "/blog/posts/book-dashboard/index.html",
       "/blog/posts/spaceship-titanic/index.html",

@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Posts",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n\n\n\n\n\n\n\n\n\n\nTitanic Survival Prediction with Tidymodels and Random Forest\n\n\nPredicting passenger survival on the Titanic using Tidymodels recipes, KNN imputation, feature engineering, and hyperparameter-tuned Random Forest in R.\n\n\n\nOct 14, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nBooks Dashboard\n\n\n\n\n\n\nAug 28, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nSpaceship Titanic\n\n\n\n\n\n\nJul 8, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nAmes Housing Price Prediction\n\n\n\n\n\n\nJun 10, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nPalmer Penguins Classification with XGboost and Resampling Method\n\n\n\n\n\n\nMay 22, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nBuild several models with workflowsets in tidymodels\n\n\n\n\n\n\nMay 13, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nApr 29, 2024\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n\n\n\n\n\n\n\n\n\n\nBreast Cancer Classification with Artificial Neural Networks\n\n\nClassifying Wisconsin breast cancer tumors as benign or malignant using an Artificial Neural Network (ANN) built with TensorFlow/Keras and evaluated with Scikit-Learn.\n\n\n\nOct 22, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTitanic Survival Prediction with Tidymodels and Random Forest\n\n\nPredicting passenger survival on the Titanic using Tidymodels recipes, KNN imputation, feature engineering, and hyperparameter-tuned Random Forest in R.\n\n\n\nOct 14, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nBooks Dashboard\n\n\n\n\n\n\nAug 28, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nSpaceship Titanic\n\n\n\n\n\n\nJul 8, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nAmes Housing Price Prediction\n\n\n\n\n\n\nJun 10, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nPalmer Penguins Classification with XGboost and Resampling Method\n\n\n\n\n\n\nMay 22, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nBuild several models with workflowsets in tidymodels\n\n\n\n\n\n\nMay 13, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nApr 29, 2024\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/post-with-code/index.html",
@@ -278,5 +278,89 @@
     "title": "Palmer Penguins Classification with XGboost and Resampling Method",
     "section": "Evaluating the model",
     "text": "Evaluating the model\nAs we can see, there are 10 results created from the resampling. Last, we fit the test data and evaluate the model with accuracy and ROC, also create confusion matrix\n\ncollect_metrics(bt_fit, summarize = FALSE)\n\n# A tibble: 30 × 5\n   id     .metric     .estimator .estimate .config             \n   &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               \n 1 Fold01 accuracy    binary        0.917  Preprocessor1_Model1\n 2 Fold01 roc_auc     binary        0.986  Preprocessor1_Model1\n 3 Fold01 brier_class binary        0.0568 Preprocessor1_Model1\n 4 Fold02 accuracy    binary        0.875  Preprocessor1_Model1\n 5 Fold02 roc_auc     binary        0.892  Preprocessor1_Model1\n 6 Fold02 brier_class binary        0.138  Preprocessor1_Model1\n 7 Fold03 accuracy    binary        0.958  Preprocessor1_Model1\n 8 Fold03 roc_auc     binary        0.972  Preprocessor1_Model1\n 9 Fold03 brier_class binary        0.0500 Preprocessor1_Model1\n10 Fold04 accuracy    binary        0.917  Preprocessor1_Model1\n# ℹ 20 more rows\n\npenguin_final &lt;- penguin_wf |&gt;\n  last_fit(penguin_split)\n\ncollect_metrics(penguin_final)\n\n# A tibble: 3 × 4\n  .metric     .estimator .estimate .config             \n  &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               \n1 accuracy    binary        0.901  Preprocessor1_Model1\n2 roc_auc     binary        0.960  Preprocessor1_Model1\n3 brier_class binary        0.0793 Preprocessor1_Model1\n\nresult &lt;- collect_predictions(penguin_final)\n\nresult |&gt; conf_mat(sex, .pred_class)\n\n          Truth\nPrediction female male\n    female     41    1\n    male        9   50\n\npenguin_final |&gt;\n  extract_fit_parsnip() |&gt;\n  vip(aesthetics = list(fill = \"navy\"))"
+  },
+  {
+    "objectID": "posts/wisconsin-cancer-classification/index.html",
+    "href": "posts/wisconsin-cancer-classification/index.html",
+    "title": "Breast Cancer Classification with Artificial Neural Networks",
+    "section": "",
+    "text": "In this project, we develop an Artificial Neural Network (ANN) model for breast cancer classification based on the classic Wisconsin Breast Cancer dataset.\nThe model classifies tumors into two diagnostic categories: - 2 = Benign (non-cancerous) - 4 = Malignant (cancerous)\nThe dataset contains 11 columns and 683 patient records collected from clinical fine needle aspirate (FNA) biopsies."
+  },
+  {
+    "objectID": "posts/wisconsin-cancer-classification/index.html#introduction",
+    "href": "posts/wisconsin-cancer-classification/index.html#introduction",
+    "title": "Breast Cancer Classification with Artificial Neural Networks",
+    "section": "",
+    "text": "In this project, we develop an Artificial Neural Network (ANN) model for breast cancer classification based on the classic Wisconsin Breast Cancer dataset.\nThe model classifies tumors into two diagnostic categories: - 2 = Benign (non-cancerous) - 4 = Malignant (cancerous)\nThe dataset contains 11 columns and 683 patient records collected from clinical fine needle aspirate (FNA) biopsies."
+  },
+  {
+    "objectID": "posts/wisconsin-cancer-classification/index.html#importing-the-libraries",
+    "href": "posts/wisconsin-cancer-classification/index.html#importing-the-libraries",
+    "title": "Breast Cancer Classification with Artificial Neural Networks",
+    "section": "Importing the libraries",
+    "text": "Importing the libraries\nWe begin by loading the essential Python libraries for data processing, deep learning with TensorFlow / Keras, and visualization.\nimport pandas as pd\nimport numpy as np\nimport tensorflow as tf\nimport matplotlib.pyplot as plt\nimport seaborn as sns"
+  },
+  {
+    "objectID": "posts/wisconsin-cancer-classification/index.html#importing-the-dataset",
+    "href": "posts/wisconsin-cancer-classification/index.html#importing-the-dataset",
+    "title": "Breast Cancer Classification with Artificial Neural Networks",
+    "section": "Importing the dataset",
+    "text": "Importing the dataset\nNext, we load the dataset from Data.csv.\ndataset = pd.read_csv('Data.csv')"
+  },
+  {
+    "objectID": "posts/wisconsin-cancer-classification/index.html#check-the-data",
+    "href": "posts/wisconsin-cancer-classification/index.html#check-the-data",
+    "title": "Breast Cancer Classification with Artificial Neural Networks",
+    "section": "Check the Data",
+    "text": "Check the Data\nLet’s inspect the first few rows of the dataset to examine the feature space:\ndataset.head()\n   Sample code number  Clump Thickness  Uniformity of Cell Size  \\\n0             1000025                5                        1   \n1             1002945                5                        4   \n2             1015425                3                        1   \n3             1016277                6                        8   \n4             1017023                4                        1   \n\n   Uniformity of Cell Shape  Marginal Adhesion  Single Epithelial Cell Size  \\\n0                         1                  1                            2   \n1                         4                  5                            7   \n2                         1                  1                            2   \n3                         8                  1                            3   \n4                         1                  3                            2   \n\n   Bare Nuclei  Bland Chromatin  Normal Nucleoli  Mitoses  Class  \n0            1                3                1        1      2  \n1           10                3                2        1      2  \n2            2                3                1        1      2  \n3            4                3                7        1      2  \n4            1                3                1        1      2  \nLet’s check the data types and verify that there are no missing values:\ndataset.info()\n&lt;class 'pandas.core.frame.DataFrame'&gt;\nRangeIndex: 683 entries, 0 to 682\nData columns (total 11 columns):\n #   Column                       Non-Null Count  Dtype\n---  ------                       --------------  -----\n 0   Sample code number           683 non-null    int64\n 1   Clump Thickness              683 non-null    int64\n 2   Uniformity of Cell Size      683 non-null    int64\n 3   Uniformity of Cell Shape     683 non-null    int64\n 4   Marginal Adhesion            683 non-null    int64\n 5   Single Epithelial Cell Size  683 non-null    int64\n 6   Bare Nuclei                  683 non-null    int64\n 7   Bland Chromatin              683 non-null    int64\n 8   Normal Nucleoli              683 non-null    int64\n 9   Mitoses                      683 non-null    int64\n 10  Class                        683 non-null    int64\ndtypes: int64(11)\nmemory usage: 58.8 KB\ndataset.isnull().sum()\nSample code number             0\nClump Thickness                0\nUniformity of Cell Size        0\nUniformity of Cell Shape       0\nMarginal Adhesion              0\nSingle Epithelial Cell Size    0\nBare Nuclei                    0\nBland Chromatin                0\nNormal Nucleoli                0\nMitoses                        0\nClass                          0\ndtype: int64\nThere are zero missing values across all 683 instances."
+  },
+  {
+    "objectID": "posts/wisconsin-cancer-classification/index.html#transform-data",
+    "href": "posts/wisconsin-cancer-classification/index.html#transform-data",
+    "title": "Breast Cancer Classification with Artificial Neural Networks",
+    "section": "Transform Data",
+    "text": "Transform Data\nWe separate our features X (excluding the ID column Sample code number and target column Class) and target variable y.\nTo prepare for binary classification in neural networks, we encode the labels: - 0 for Benign (Class == 2) - 1 for Malignant (Class == 4)\nX = dataset.iloc[:, 1:-1].values\ny = dataset.iloc[:, -1].values\n\ny = np.where(y == 2, 0, 1)"
+  },
+  {
+    "objectID": "posts/wisconsin-cancer-classification/index.html#splitting-the-dataset-into-the-training-set-and-test-set",
+    "href": "posts/wisconsin-cancer-classification/index.html#splitting-the-dataset-into-the-training-set-and-test-set",
+    "title": "Breast Cancer Classification with Artificial Neural Networks",
+    "section": "Splitting the dataset into the Training set and Test set",
+    "text": "Splitting the dataset into the Training set and Test set\nWe perform an 80/20 train-test split, reserving 20% of the data (137 samples) to evaluate generalizability:\nfrom sklearn.model_selection import train_test_split\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=11)"
+  },
+  {
+    "objectID": "posts/wisconsin-cancer-classification/index.html#feature-scaling-the-dataset",
+    "href": "posts/wisconsin-cancer-classification/index.html#feature-scaling-the-dataset",
+    "title": "Breast Cancer Classification with Artificial Neural Networks",
+    "section": "Feature Scaling the Dataset",
+    "text": "Feature Scaling the Dataset\nNeural networks use gradient descent optimization, which converges much faster and more reliably when all input features are on a standardized scale. We apply StandardScaler (Z-score normalization) fit exclusively on the training set:\nfrom sklearn.preprocessing import StandardScaler\nsc = StandardScaler()\nX_train = sc.fit_transform(X_train)\nX_test = sc.transform(X_test)"
+  },
+  {
+    "objectID": "posts/wisconsin-cancer-classification/index.html#building-ann-model",
+    "href": "posts/wisconsin-cancer-classification/index.html#building-ann-model",
+    "title": "Breast Cancer Classification with Artificial Neural Networks",
+    "section": "Building ANN Model",
+    "text": "Building ANN Model\nWe build a feed-forward sequential neural network using TensorFlow / Keras.\nann = tf.keras.models.Sequential()\n\nAdding first hidden layer\nThe first hidden layer consists of 8 neurons with the Rectified Linear Unit (relu) activation function:\nann.add(tf.keras.layers.Dense(units=8, activation='relu'))\n\n\nAdding second hidden layer\nWe add a second dense layer with 8 neurons and relu activation to capture non-linear feature interactions:\nann.add(tf.keras.layers.Dense(units=8, activation='relu'))\n\n\nAdding output layer\nFor binary classification, our output layer consists of a single neuron with a sigmoid activation function, outputting a probability between 0 and 1:\nann.add(tf.keras.layers.Dense(units=1, activation='sigmoid'))"
+  },
+  {
+    "objectID": "posts/wisconsin-cancer-classification/index.html#compile-the-ann-model",
+    "href": "posts/wisconsin-cancer-classification/index.html#compile-the-ann-model",
+    "title": "Breast Cancer Classification with Artificial Neural Networks",
+    "section": "Compile the ANN Model",
+    "text": "Compile the ANN Model\nWe compile the network using the adam optimizer and binary_crossentropy as our loss function, tracking classification accuracy:\nann.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])"
+  },
+  {
+    "objectID": "posts/wisconsin-cancer-classification/index.html#training-the-ann-model",
+    "href": "posts/wisconsin-cancer-classification/index.html#training-the-ann-model",
+    "title": "Breast Cancer Classification with Artificial Neural Networks",
+    "section": "Training the ANN Model",
+    "text": "Training the ANN Model\nWe train the model on X_train with a batch size of 32 over 100 epochs:\nann.fit(X_train, y_train, batch_size=32, epochs=100)\nEpoch 1/100\n18/18 [==============================] - 2s 5ms/step - accuracy: 0.1076 - loss: 0.7738\nEpoch 2/100\n18/18 [==============================] - 0s 5ms/step - accuracy: 0.2668 - loss: 0.7041\nEpoch 3/100\n18/18 [==============================] - 0s 5ms/step - accuracy: 0.5978 - loss: 0.6490\nEpoch 4/100\n18/18 [==============================] - 0s 5ms/step - accuracy: 0.7442 - loss: 0.6170\n...\nEpoch 100/100\n18/18 [==============================] - 0s 5ms/step - accuracy: 0.9780 - loss: 0.0521\nOver 100 epochs, the training loss decreases steadily while training accuracy reaches ~97.8%."
+  },
+  {
+    "objectID": "posts/wisconsin-cancer-classification/index.html#evaluating-the-model-with-confusion-matrix",
+    "href": "posts/wisconsin-cancer-classification/index.html#evaluating-the-model-with-confusion-matrix",
+    "title": "Breast Cancer Classification with Artificial Neural Networks",
+    "section": "Evaluating the Model with Confusion Matrix",
+    "text": "Evaluating the Model with Confusion Matrix\nFinally, we evaluate the trained ANN on our held-out test set (X_test). We convert predicted probabilities to binary class predictions using a decision threshold of 0.5, and compute the test accuracy and confusion matrix:\nfrom sklearn.metrics import confusion_matrix, accuracy_score\n\ny_pred = ann.predict(X_test)\ny_pred = (y_pred &gt; 0.5)\ncm = confusion_matrix(y_test, y_pred)\n\naccuracy = accuracy_score(y_test, y_pred)\nprint('accuracy of model : {:.2f}%'.format(accuracy * 100))\n\nsns.heatmap(cm, annot=True, cmap=\"crest\", cbar=False, \n            xticklabels=['Benign', 'Malignant'], \n            yticklabels=['Benign', 'Malignant'])\nplt.title('Confusion Matrix')\nplt.xlabel('Predicted')\nplt.ylabel('True')\nplt.show()\naccuracy of model : 98.54%\n\n\n\n\n\n\nEvaluation Highlights:\n\nTest Accuracy: The model achieves 98.54% accuracy on unseen test data (135 out of 137 correctly diagnosed).\nConfusion Matrix Breakdown:\n\nTrue Benign correctly predicted: 85 / 86 (only 1 false positive).\nTrue Malignant correctly predicted: 50 / 51 (only 1 false negative).\n\nIn medical diagnostics, minimizing false negatives (misclassifying malignant tumors as benign) is critical, and the network demonstrates exceptional sensitivity on this benchmark."
   }
 ]
